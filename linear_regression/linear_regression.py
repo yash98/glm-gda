@@ -3,6 +3,7 @@ import statistics
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
+from matplotlib import animation
 
 x = 0
 y = 0
@@ -86,6 +87,9 @@ def error_function(t0s, t1s):
     z /= (2*y.size)
     return z
 
+# def animate_3d_theta_error(i):
+
+
 def plot_3d_error_mesh():
     t0first = theta_store[0][0]
     t0last = theta_store[len(theta_store)-1][0]
@@ -96,9 +100,13 @@ def plot_3d_error_mesh():
     T0, T1 = np.meshgrid(t0, t1)
     Z = mesh_of_error_function(T0, T1)
 
-    # fig = plt.figure()
+    fig = plt.figure()
     ax = plt.axes(projection='3d')
-    ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+    ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap='Reds', edgecolor='none')
+    theta_x = [theta_store[i][0] for i in range(len(theta_store))]
+    theta_y = [theta_store[i][1] for i in range(len(theta_store))]
+    theta_z = [error_function(theta_x[i], theta_y[i]) for i in range(len(theta_store))]
+    ax.scatter3D(theta_x, theta_y, theta_z, c='black', marker='o')
     ax.set_title('3D mesh of error function')
     ax.set_xlabel('Theta0')
     ax.set_ylabel('Theta1')
