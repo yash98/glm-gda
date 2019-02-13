@@ -3,7 +3,6 @@ import statistics
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-import os.path
 
 x = 0
 y = 0
