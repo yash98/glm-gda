@@ -48,7 +48,7 @@ def batch_grad_desc (eta, epsilon):
     num_iterations = 0
 
     print("number of iterations: mean square error")
-    while (lms_error>epsilon and num_iterations<101 and prev_lms_error >= lms_error):
+    while (lms_error>epsilon and num_iterations<100 and prev_lms_error >= lms_error):
         prev_lms_error = lms_error
         lms_error = 0.0
         sumof_product_diff_x = np.zeros(2)
@@ -59,11 +59,12 @@ def batch_grad_desc (eta, epsilon):
             lms_error += diff_actual_pred**2
         lms_error /= 2*y.size
         # update
-        theta = theta + (eta*sumof_product_diff_x)/y.size
-        theta_store.append(theta)
-        if (num_iterations%10==0):
-            print(str(num_iterations) + ": " + str(lms_error))
-        num_iterations += 1
+        if(prev_lms_error>=lms_error):
+            theta = theta + (eta*sumof_product_diff_x)/y.size
+            theta_store.append(theta)
+            if (num_iterations%10==0):
+                print(str(num_iterations) + ": " + str(lms_error))
+            num_iterations += 1
     
     print(str(num_iterations) + ": " + str(lms_error))
             
@@ -100,7 +101,7 @@ def plot_3d_error_mesh():
     T0, T1 = np.meshgrid(t0, t1)
     Z = mesh_of_error_function(T0, T1)
 
-    fig = plt.figure()
+    # fig = plt.figure()
     ax = plt.axes(projection='3d')
     ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap='Reds', edgecolor='none')
     theta_x = [theta_store[i][0] for i in range(len(theta_store))]
