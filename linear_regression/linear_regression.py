@@ -108,6 +108,7 @@ def plot_3d_error_mesh():
     theta_y = [theta_store[i][1] for i in range(len(theta_store))]
     theta_z = [error_function(theta_x[i], theta_y[i]) for i in range(len(theta_store))]
     ax.scatter3D(theta_x, theta_y, theta_z, c='black', marker='o')
+    
     ax.set_title('3D mesh of error function')
     ax.set_xlabel('Theta0')
     ax.set_ylabel('Theta1')
