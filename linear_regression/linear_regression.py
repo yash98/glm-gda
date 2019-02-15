@@ -110,8 +110,8 @@ def init_theta_3d_plotting():
     t1last = theta_store[len(theta_store)-1][1]
     # t0 = np.linspace(t0first, 2*t0last-t0first,70)
     # t1 = np.linspace(t1first, 2*t1last-t1first,70)
-    t0 = np.linspace(-2.0, 2.0,70)
-    t1 = np.linspace(-2.0, 2.0,70)
+    t0 = np.linspace(-2.0, 3.0,70)
+    t1 = np.linspace(-3.0, 3.0,70)
     T0, T1 = np.meshgrid(t0, t1)
     Z = mesh_of_error_function(T0, T1)
 
@@ -129,7 +129,7 @@ def plot_3d_error_mesh(time_gap):
     try:
         for i in range(len(theta_store)):
             plt.pause(time_gap)
-            ax.scatter3D([theta_store[i][0]], [theta_store[i][1]], [error_function(theta_store[i][0], theta_store[i][1])], c='g', marker='o')
+            ax.scatter3D([theta_store[i][0]], [theta_store[i][1]], [error_function(theta_store[i][0], theta_store[i][1])], c='red', marker='.')
     except Exception:
         pass
 
@@ -152,7 +152,7 @@ def plot_contours(time_gap):
     try:
         for i in range(len(theta_store)):
             plt.pause(time_gap)
-            ax.plot([theta_store[i][0]], [theta_store[i][1]], c='g', marker='o')
+            ax.plot([theta_store[i][0]], [theta_store[i][1]], c='red', marker='.')
     except Exception:
         pass
 
@@ -161,14 +161,13 @@ def plot_contours(time_gap):
 def init():
     global theta, theta_store
     load_data(sys.argv[1], sys.argv[2])
-    # 1D data assumed
     theta = np.zeros(shape=(2), dtype=float)
     theta_store.append(theta)
 
 def main():
     init()
     normalize_stats_data()
-    batch_grad_desc(float(sys.argv[3]), 0.00001)
+    batch_grad_desc(float(sys.argv[3]), 0.000001)
     plot_hypothesis()
     init_theta_3d_plotting()
     plot_3d_error_mesh(float(sys.argv[4]))

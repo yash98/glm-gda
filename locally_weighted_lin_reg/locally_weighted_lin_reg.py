@@ -96,9 +96,9 @@ def plot_hypothesis_local(tau):
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.plot(x, y, marker='.', linestyle='None')
-    for i in range(200):
-        x_start = x_min + i*(x_max-x_min)/200
-        x_end = x_min + (i+1)*(x_max-x_min)/200
+    for i in range(1000):
+        x_start = x_min + i*(x_max-x_min)/1000
+        x_end = x_min + (i+1)*(x_max-x_min)/1000
 
         make_w((x_start+x_end)/2, tau, False)
         weighted_normal_eq_solve()

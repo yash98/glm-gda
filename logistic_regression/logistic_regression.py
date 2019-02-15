@@ -80,7 +80,7 @@ def newton_method(epsilon):
     prev_jump = 10000000000000000000000
     num_iterations = 0
     theta_update = 0
-    while(jump > epsilon and jump<prev_jump and num_iterations<100000000):
+    while(jump > epsilon and jump<prev_jump and num_iterations<100):
         theta_update = np.matmul(hessian_inv(), derivative())
         theta = theta - theta_update
         prev_jump = jump
