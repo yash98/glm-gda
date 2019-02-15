@@ -118,8 +118,8 @@ def plot_conic():
     cx12 = sigma_diff[1][1]
     cx0x1 = sigma_diff[1][0] + sigma_diff[0][1]
 
-    x_lin = np.linspace(x_min[0], x_max[0], 1000)
-    y_lin = np.linspace(x_min[1], x_max[1], 1000)
+    x_lin = np.linspace(x_min[0], x_max[0], 500)
+    y_lin = np.linspace(x_min[1], x_max[1], 500)
 
     X0, X1 = np.meshgrid(x_lin, y_lin)
     F = cx02*(X0**2)+cx12*(X1**2)+cx0x1*(X0*X1)+cx0*X0+cx1*X1+c
@@ -135,8 +135,10 @@ def init():
 
 def main():
     init()
-    plot_linear()
-    plot_conic()
+    if (sys.argv[3]=="0"):
+        plot_linear()
+    elif (sys.argv[3]=="1"):
+        plot_conic()
 
 if (__name__=="__main__"):
     main()

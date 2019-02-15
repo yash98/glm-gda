@@ -40,18 +40,14 @@ def normalize_stats_data():
     xn_min = (x_min-x_mean)/x_sd
     xn_max = (x_max-x_mean)/x_sd
 
-def make_w(index, tau):
+def make_w(index, tau, belongs):
     global w
-    w = []
+    w = np.zeros(shape=(x.size, x.size))
     for i in range(x.size):
-        wr = []
-        for j in range(x.size):
-            if (i==j):
-                wr.append(math.exp(-((x[j]-x[index])**2)/(2*(tau**2))))
-            else:
-                wr.append(0.0)
-        w.append(wr)
-    w = np.array(w)
+        if (belongs):
+            w[i][i] = math.exp(-((x[i]-x[index])**2)/(2*(tau**2)))
+        else:
+            w[i][i] = math.exp(-((x[i]-index)**2)/(2*(tau**2)))
 
 
 def batch_grad_desc (eta, epsilon):
@@ -84,22 +80,29 @@ def batch_grad_desc (eta, epsilon):
     
     print(str(num_iterations) + ": " + str(lms_error))
             
-def plot_hypothesis(isNormal):
+def plot_hypothesis_lin():
     plt.plot(x, y, marker='.', linestyle='None')
-    xh_min = x_min
-    xh_max = x_max
-    if isNormal:
-        xh_min = xn_min
-        xh_max = xn_max
-    plt.plot([x_min, x_max], [theta[0]+theta[1]*xh_min, theta[0]+theta[1]*xh_max], marker='None')
+    plt.plot([x_min, x_max], [theta[0]+theta[1]*xn_min, theta[0]+theta[1]*xn_max], marker='None')
+    plt.show()
+
+def plot_hypothesis_local(tau):
+    plt.plot(x, y, marker='.', linestyle='None')
+    for i in range(200):
+        x_start = x_min + i*(x_max-x_min)/200
+        x_end = x_min + (i+1)*(x_max-x_min)/200
+
+        make_w((x_start+x_end)/2, tau, False)
+        weighted_normal_eq_solve()
+
+        plt.plot([x_start, x_end], [theta[1][0]+theta[0][0]*x_start, theta[1][0]+theta[0][0]*x_end], marker='None', c='red')
     plt.show()
 
 def weighted_normal_eq_solve():
     global theta, x_w_intercepts
     x_w_intercepts = np.array([[x[i], 1] for i in range(x.size)])
     xtw = np.matmul(np.transpose(x_w_intercepts), w)
-    y_proper = np.array([[y[i]] for i in range(y.size)])
-    coeff_y = np.matmul(np.linalg.inv(np.matmul(xtw,x_w_intercepts)),xtw)
+    y_proper = y[np.newaxis].T
+    coeff_y = np.matmul(np.linalg.inv(np.matmul(xtw, x_w_intercepts)),xtw)
     theta = np.matmul(coeff_y, y_proper)
 
 def init():
@@ -113,12 +116,10 @@ def main():
     init()
     normalize_stats_data()
 
-    # batch_grad_desc(0.4, 0.000001)
-    # plot_hypothesis(True)
+    batch_grad_desc(0.4, 0.000001)
+    plot_hypothesis_lin()
 
-    make_w(3,0.2)
-    weighted_normal_eq_solve()
-    plot_hypothesis(False)
+    plot_hypothesis_local(float(sys.argv[3]))
 
 if (__name__=="__main__"):
     main()

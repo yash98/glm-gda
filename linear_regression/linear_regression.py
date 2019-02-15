@@ -2,7 +2,7 @@ import sys
 import statistics
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
+import mpl_toolkits.mplot3d.axes3d as p3
 from matplotlib.animation import FuncAnimation
 
 x = 0
@@ -74,7 +74,6 @@ def plot_hypothesis():
     ax.plot(x, y, marker='.', linestyle='None')
     ax.plot([x_min, x_max], [theta[0]+theta[1]*xn_min, theta[0]+theta[1]*xn_max], marker='None')
     plt.show()
-    ax.clear()
 
 def mesh_of_error_function(t0, t1):
     tz = np.zeros(shape=(int(t0.size/t0[0].size), t0[0].size))
@@ -91,41 +90,57 @@ def error_function(t0s, t1s):
     z /= (2*y.size)
     return z
 
-fig, ax = 0, 0
-theta_x = []
-theta_y = []
-theta_z = []
-ln = 0
-def mesh_init():
-    global ln, fig, ax
+t0first = 0
+t0last = 0
+t1first = 0
+t1last = 0
+T0 = 0
+T1 = 0
+Z = 0
+
+def init_theta_3d_plotting():
+    global t0first, t0last, t1first, t1last, T0, T1, Z
+    t0first = theta_store[0][0]
+    t0last = theta_store[len(theta_store)-1][0]
+    t1first = theta_store[0][1]
+    t1last = theta_store[len(theta_store)-1][1]
+    # t0 = np.linspace(t0first, 2*t0last-t0first,70)
+    # t1 = np.linspace(t1first, 2*t1last-t1first,70)
+    t0 = np.linspace(-2.0, 2.0,70)
+    t1 = np.linspace(-2.0, 2.0,70)
+    T0, T1 = np.meshgrid(t0, t1)
+    Z = mesh_of_error_function(T0, T1)
+
+def plot_3d_error_mesh(time_gap):
+    fig = plt.figure()
+    ax = p3.Axes3D(fig)
+
     ax.set_title('3D mesh of error function')
     ax.set_xlabel('Theta0')
     ax.set_ylabel('Theta1')
     ax.set_zlabel('J(Theta)')
 
-    t0first = theta_store[0][0]
-    t0last = theta_store[len(theta_store)-1][0]
-    t1first = theta_store[0][1]
-    t1last = theta_store[len(theta_store)-1][1]
-    t0 = np.linspace(t0first, 2*t0last-t0first,50)
-    t1 = np.linspace(t1first, 2*t1last-t1first,50)
-    T0, T1 = np.meshgrid(t0, t1)
-    Z = mesh_of_error_function(T0, T1)
-    ln, = ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap='Reds', edgecolor='none', animated=True)
-    return ln,
+    ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap='plasma', edgecolor='none')
 
-def mesh_update(frame):
-    global theta_x, theta_y, theta_z
-    theta_x.append(theta_store[frame][0])
-    theta_y.append(theta_store[frame][1])
-    theta_z.append(error_function(theta_x[frame], theta_y[frame]))
-    ax.clear()
-    ln, = ax.scatter3D(theta_x, theta_y, theta_z, c='black', marker='o', animated=True)
-    return ln,
+    for i in range(len(theta_store)):
+        plt.pause(time_gap)
+        ax.scatter3D([theta_store[i][0]], [theta_store[i][1]], [error_function(theta_store[i][0], theta_store[i][1])], c='g', marker='o')
+    
+    plt.show()
 
-def plot_3d_error_mesh(time_gap):
-    fig, ax = plt.subplots()    
-    ani = FuncAnimation(fig, mesh_update, frames=range(len(theta_store)), init_func=mesh_init, interval=time_gap*1000)
+def plot_contours(time_gap):
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+
+    max_contour = 0.9*error_function(t0first, t1first)
+    for i in range(6):
+        contour_level = i*(max_contour/5)
+        plt.contour(T0, T1, Z, [contour_level], colors='k')
+
+    for i in range(len(theta_store)):
+        plt.pause(time_gap)
+        ax.plot([theta_store[i][0]], [theta_store[i][1]], c='g', marker='o')
+
     plt.show()
 
 def init():
@@ -139,8 +154,10 @@ def main():
     init()
     normalize_stats_data()
     batch_grad_desc(float(sys.argv[3]), 0.00001)
-    # plot_hypothesis()
+    plot_hypothesis()
+    init_theta_3d_plotting()
     plot_3d_error_mesh(float(sys.argv[4]))
+    plot_contours(float(sys.argv[4]))
 
 if (__name__=="__main__"):
     main()
