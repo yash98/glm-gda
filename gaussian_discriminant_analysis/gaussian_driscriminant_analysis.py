@@ -84,16 +84,43 @@ def set_sigma():
 
 def plot_linear():
     plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
-    c = np.matmul(np.matmul(np.transpose(mu[1]), sigma[2]), mu[1])
-    c -= np.matmul(np.matmul(np.transpose(mu[0]), sigma[2]), mu[0])
-    cx = np.matmul(np.transpose(mu[0]-mu[1]), sigma[2])
-    cxt = np.matmul(sigma[2], mu[0]-mu[1])
-    cx0 = cxt[0]+cx[0]
-    cx1 = cxt[1]+cx[1]
+    c = np.matmul(np.matmul((mu[1])[np.newaxis], sigma[2]), (mu[1])[np.newaxis].T)
+    c -= np.matmul(np.matmul((mu[0])[np.newaxis], sigma[2]), (mu[0])[np.newaxis].T)
+    c = c[0][0]
+    mu_diff = (mu[0]-mu[1])[np.newaxis]
+    cx = np.matmul(mu_diff, sigma[2])
+    cxt = np.matmul(sigma[2], mu_diff.T)
+    cx0 = cxt[0][0]+cx[0][0]
+    cx1 = cxt[1][0]+cx[0][1]
 
     axes = plt.gca()
     axes.set_ylim([x_min[1]-1.0,x_max[1]+1.0])
     plt.plot([x_min[0], x_max[0]], [-(cx0*x_min[0]+c)/cx1, -(cx0*x_max[0]+c)/cx1], marker='None')
+    plt.show()
+
+def plot_conic():
+    plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
+    c = np.matmul(np.matmul((mu[1])[np.newaxis], sigma[1]), (mu[1])[np.newaxis].T)
+    c -= np.matmul(np.matmul((mu[0])[np.newaxis], sigma[0]), (mu[0])[np.newaxis].T)
+    c = c[0][0] + np.linalg.det(sigma[1]) - np.linalg.det(sigma[0])
+
+    cx = np.matmul((mu[0])[np.newaxis], sigma[0]) - np.matmul((mu[1])[np.newaxis], sigma[1])
+    cxt = np.matmul(sigma[0], (mu[0])[np.newaxis].T) - np.matmul(sigma[1], (mu[1])[np.newaxis].T)
+    cx0 = cxt[0][0]+cx[0][0]
+    cx1 = cxt[1][0]+cx[0][1]
+
+    sigma_diff = sigma[1] - sigma[0]
+    cx02 = sigma_diff[0][0]
+    cx12 = sigma_diff[1][1]
+    cx0x1 = sigma_diff[1][0] + sigma_diff[0][1]
+
+    x_lin = np.linspace(x_min[0], x_max[0], 1000)
+    y_lin = np.linspace(x_min[1], x_max[1], 1000)
+
+    X0, X1 = np.meshgrid(x_lin, y_lin)
+    F = cx02*(X0**2)+cx12*(X1**2)+cx0x1*(X0*X1)+cx0*X0+cx1*X1+c
+    plt.contour(X0, X1, F, [0], colors='k')
+    # plt.contour(X0, X1, (cx02*(xl**2)+cx12(yl**2)+cx0x1*(xl*yl)+cx0*xl+cx1*yl+c), [0])
     plt.show()
 
 def init():
@@ -106,6 +133,7 @@ def init():
 def main():
     init()
     plot_linear()
+    plot_conic()
 
 if (__name__=="__main__"):
     main()
