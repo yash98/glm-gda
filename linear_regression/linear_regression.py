@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as p3
 from matplotlib.animation import FuncAnimation
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 x = 0
 y = 0
@@ -73,6 +75,8 @@ def plot_hypothesis():
     ax = fig.add_subplot(1,1,1)
     ax.plot(x, y, marker='.', linestyle='None')
     ax.plot([x_min, x_max], [theta[0]+theta[1]*xn_min, theta[0]+theta[1]*xn_max], marker='None')
+    ax.set_xlabel("Acidity")
+    ax.set_ylabel("Density")
     plt.show()
 
 def mesh_of_error_function(t0, t1):
@@ -120,26 +124,37 @@ def plot_3d_error_mesh(time_gap):
     ax.set_ylabel('Theta1')
     ax.set_zlabel('J(Theta)')
 
-    ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap='plasma', edgecolor='none')
+    surf = ax.plot_surface(T0, T1, Z, rstride=1, cstride=1, cmap=cm.coolwarm, edgecolor='none')
 
-    for i in range(len(theta_store)):
-        plt.pause(time_gap)
-        ax.scatter3D([theta_store[i][0]], [theta_store[i][1]], [error_function(theta_store[i][0], theta_store[i][1])], c='g', marker='o')
-    
+    try:
+        for i in range(len(theta_store)):
+            plt.pause(time_gap)
+            ax.scatter3D([theta_store[i][0]], [theta_store[i][1]], [error_function(theta_store[i][0], theta_store[i][1])], c='g', marker='o')
+    except Exception:
+        pass
+
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
 
 def plot_contours(time_gap):
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("Theta0")
+    ax.set_ylabel("Theta1")
 
     max_contour = 0.9*error_function(t0first, t1first)
     for i in range(6):
         contour_level = i*(max_contour/5)
         plt.contour(T0, T1, Z, [contour_level], colors='k')
 
-    for i in range(len(theta_store)):
-        plt.pause(time_gap)
-        ax.plot([theta_store[i][0]], [theta_store[i][1]], c='g', marker='o')
+    try:
+        for i in range(len(theta_store)):
+            plt.pause(time_gap)
+            ax.plot([theta_store[i][0]], [theta_store[i][1]], c='g', marker='o')
+    except Exception:
+        pass
 
     plt.show()
 

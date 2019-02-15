@@ -92,10 +92,15 @@ def newton_method(epsilon):
     print(str(num_iterations) + ": " + str(theta))
 
 def plot_hypothesis():
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("X0")
+    ax.set_ylabel("X1")
     axes = plt.gca()
     axes.set_ylim([x_min[1]-1.0,x_max[1]+1.0])
     plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
-    plt.plot([x_min[0], x_max[0]], [(-(theta[0]/theta[1])*xn_min[0])*x_sd[1]+x_mean[1], -((theta[0]/theta[1])*xn_max[0])*x_sd[1]+x_mean[1]], marker='None')
+    plt.plot([x_min[0], x_max[0]], [(-(theta[0]/theta[1])*xn_min[0])*x_sd[1]+x_mean[1], -((theta[0]/theta[1])*xn_max[0])*x_sd[1]+x_mean[1]], marker='None', label="Seperator")
+    plt.legend()
     plt.show()
 
 def init():

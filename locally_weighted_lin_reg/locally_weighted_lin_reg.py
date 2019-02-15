@@ -81,12 +81,21 @@ def batch_grad_desc (eta, epsilon):
     print(str(num_iterations) + ": " + str(lms_error))
             
 def plot_hypothesis_lin():
-    plt.plot(x, y, marker='.', linestyle='None')
-    plt.plot([x_min, x_max], [theta[0]+theta[1]*xn_min, theta[0]+theta[1]*xn_max], marker='None')
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.plot(x, y, marker='.', linestyle='None')
+    ax.plot([x_min, x_max], [theta[0]+theta[1]*xn_min, theta[0]+theta[1]*xn_max], marker='None', label="hypothesis")
+    plt.legend()
     plt.show()
 
 def plot_hypothesis_local(tau):
-    plt.plot(x, y, marker='.', linestyle='None')
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.plot(x, y, marker='.', linestyle='None')
     for i in range(200):
         x_start = x_min + i*(x_max-x_min)/200
         x_end = x_min + (i+1)*(x_max-x_min)/200
@@ -94,7 +103,8 @@ def plot_hypothesis_local(tau):
         make_w((x_start+x_end)/2, tau, False)
         weighted_normal_eq_solve()
 
-        plt.plot([x_start, x_end], [theta[1][0]+theta[0][0]*x_start, theta[1][0]+theta[0][0]*x_end], marker='None', c='red')
+        ax.plot([x_start, x_end], [theta[1][0]+theta[0][0]*x_start, theta[1][0]+theta[0][0]*x_end], marker='None', c='red')
+    plt.legend()
     plt.show()
 
 def weighted_normal_eq_solve():

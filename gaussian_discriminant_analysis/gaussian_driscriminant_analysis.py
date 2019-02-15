@@ -87,6 +87,14 @@ def set_sigma():
         inv_sigma[i] = np.linalg.inv(sigma[i])
 
 def plot_linear():
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("X0")
+    ax.set_ylabel("X1")
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("Theta0")
+    ax.set_ylabel("Theta1")
     plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
     c = np.matmul(np.matmul((mu[1])[np.newaxis], inv_sigma[2]), (mu[1])[np.newaxis].T)
     c -= np.matmul(np.matmul((mu[0])[np.newaxis], inv_sigma[2]), (mu[0])[np.newaxis].T)
@@ -99,10 +107,15 @@ def plot_linear():
 
     axes = plt.gca()
     axes.set_ylim([x_min[1]-1.0,x_max[1]+1.0])
-    plt.plot([x_min[0], x_max[0]], [-(cx0*x_min[0]+c)/cx1, -(cx0*x_max[0]+c)/cx1], marker='None')
+    plt.plot([x_min[0], x_max[0]], [-(cx0*x_min[0]+c)/cx1, -(cx0*x_max[0]+c)/cx1], marker='None', label="linear seperator")
+    plt.legend()
     plt.show()
 
 def plot_conic():
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel("X0")
+    ax.set_ylabel("X1")
     plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
     c = np.matmul(np.matmul((mu[1])[np.newaxis], inv_sigma[1]), (mu[1])[np.newaxis].T)
     c -= np.matmul(np.matmul((mu[0])[np.newaxis], inv_sigma[0]), (mu[0])[np.newaxis].T)
@@ -123,7 +136,8 @@ def plot_conic():
 
     X0, X1 = np.meshgrid(x_lin, y_lin)
     F = cx02*(X0**2)+cx12*(X1**2)+cx0x1*(X0*X1)+cx0*X0+cx1*X1+c
-    plt.contour(X0, X1, F, [0], colors='k')
+    plt.contour(X0, X1, F, [0], colors='k', label="quadratic seperator")
+    # plt.legend()
     plt.show()
 
 def init():
