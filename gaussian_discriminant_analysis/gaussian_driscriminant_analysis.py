@@ -19,6 +19,7 @@ x1 = 0
 phi = 0.0
 mu = np.zeros(shape=(2, 2))
 sigma = np.zeros(shape=(3,2,2))
+inv_sigma = np.zeros(shape=(3,2,2))
 
 def load_data (file_x, file_y):
     global x, y, y_int
@@ -82,16 +83,19 @@ def set_sigma():
     sigma[0] /= (y_int.size-count)
     sigma[1] /= count
 
+    for i in range(3):
+        inv_sigma[i] = np.linalg.inv(sigma[i])
+
 def plot_linear():
     plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
-    c = np.matmul(np.matmul((mu[1])[np.newaxis], sigma[2]), (mu[1])[np.newaxis].T)
-    c -= np.matmul(np.matmul((mu[0])[np.newaxis], sigma[2]), (mu[0])[np.newaxis].T)
+    c = np.matmul(np.matmul((mu[1])[np.newaxis], inv_sigma[2]), (mu[1])[np.newaxis].T)
+    c -= np.matmul(np.matmul((mu[0])[np.newaxis], inv_sigma[2]), (mu[0])[np.newaxis].T)
     c = c[0][0]
+    c += 2*(math.log(phi) - math.log(1-phi))
     mu_diff = (mu[0]-mu[1])[np.newaxis]
-    cx = np.matmul(mu_diff, sigma[2])
-    cxt = np.matmul(sigma[2], mu_diff.T)
-    cx0 = cxt[0][0]+cx[0][0]
-    cx1 = cxt[1][0]+cx[0][1]
+    cx = np.matmul(mu_diff, inv_sigma[2])
+    cx0 = 2*cx[0][0]
+    cx1 = 2*cx[0][1]
 
     axes = plt.gca()
     axes.set_ylim([x_min[1]-1.0,x_max[1]+1.0])
@@ -100,16 +104,16 @@ def plot_linear():
 
 def plot_conic():
     plt.scatter(x0, x1, marker='.', linestyle='None', c=y_int)
-    c = np.matmul(np.matmul((mu[1])[np.newaxis], sigma[1]), (mu[1])[np.newaxis].T)
-    c -= np.matmul(np.matmul((mu[0])[np.newaxis], sigma[0]), (mu[0])[np.newaxis].T)
-    c = c[0][0] + np.linalg.det(sigma[1]) - np.linalg.det(sigma[0])
+    c = np.matmul(np.matmul((mu[1])[np.newaxis], inv_sigma[1]), (mu[1])[np.newaxis].T)
+    c -= np.matmul(np.matmul((mu[0])[np.newaxis], inv_sigma[0]), (mu[0])[np.newaxis].T)
+    c = c[0][0] + math.log(np.linalg.det(sigma[1])) - math.log(np.linalg.det(sigma[0]))
+    c += 2*(math.log(phi) - math.log(1-phi))
 
-    cx = np.matmul((mu[0])[np.newaxis], sigma[0]) - np.matmul((mu[1])[np.newaxis], sigma[1])
-    cxt = np.matmul(sigma[0], (mu[0])[np.newaxis].T) - np.matmul(sigma[1], (mu[1])[np.newaxis].T)
-    cx0 = cxt[0][0]+cx[0][0]
-    cx1 = cxt[1][0]+cx[0][1]
+    cx = np.matmul((mu[0])[np.newaxis], inv_sigma[0]) - np.matmul((mu[1])[np.newaxis], inv_sigma[1])
+    cx0 = 2*cx[0][0]
+    cx1 = 2*cx[0][1]
 
-    sigma_diff = sigma[1] - sigma[0]
+    sigma_diff = inv_sigma[1] - inv_sigma[0]
     cx02 = sigma_diff[0][0]
     cx12 = sigma_diff[1][1]
     cx0x1 = sigma_diff[1][0] + sigma_diff[0][1]
@@ -120,7 +124,6 @@ def plot_conic():
     X0, X1 = np.meshgrid(x_lin, y_lin)
     F = cx02*(X0**2)+cx12*(X1**2)+cx0x1*(X0*X1)+cx0*X0+cx1*X1+c
     plt.contour(X0, X1, F, [0], colors='k')
-    # plt.contour(X0, X1, (cx02*(xl**2)+cx12(yl**2)+cx0x1*(xl*yl)+cx0*xl+cx1*yl+c), [0])
     plt.show()
 
 def init():
